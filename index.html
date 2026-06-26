@@ -116,23 +116,6 @@
       color: var(--ink);
     }
     .fallback p strong { color: var(--primary); }
-    .links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-    }
-    .links a {
-      display: inline-block;
-      text-decoration: none;
-      background: var(--primary);
-      color: #fff;
-      font-weight: 500;
-      font-size: 0.95rem;
-      padding: 0.6rem 1.1rem;
-      border-radius: 999px;
-    }
-    .links a:hover { background: #00404f; }
-    .links a:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
   </style>
 </head>
 <body>
@@ -156,9 +139,7 @@
     </button>
 
     <div class="fallback" id="fallback">
-      <p>Il browser ha bloccato l'apertura automatica delle schede. Per consentirle, clicca sull'icona di <strong>popup bloccato</strong> nella barra degli indirizzi e scegli "Consenti sempre", poi premi di nuovo "Inizia il test".</p>
-      <p>In alternativa, apri le 4 schede manualmente:</p>
-      <div class="links" id="links"></div>
+      <p>Il browser ha bloccato l'apertura delle schede. Per consentirle, clicca sull'icona di <strong>popup bloccato</strong> nella barra degli indirizzi e scegli "Consenti sempre", poi premi di nuovo "Inizia il test".</p>
     </div>
   </main>
 
@@ -171,29 +152,34 @@
     ];
 
     const fallback = document.getElementById("fallback");
-    const links = document.getElementById("links");
-
-    // Prepara i link manuali (aperti uno per click: sempre consentiti)
-    urls.forEach((url, i) => {
-      const a = document.createElement("a");
-      a.href = url;
-      a.target = "_blank";
-      a.rel = "noopener";
-      a.textContent = "Scheda " + (i + 1);
-      links.appendChild(a);
-    });
 
     document.getElementById("apri").addEventListener("click", () => {
+      const opened = [];
       let blocked = false;
-      urls.forEach(url => {
+
+      // Apre le 4 schede tenendone i riferimenti. Subito dopo l'apertura
+      // riporta il focus a questa pagina, così le prime restano "dietro".
+      for (const url of urls) {
         const win = window.open(url, "_blank");
         if (!win || win.closed || typeof win.closed === "undefined") {
           blocked = true;
+        } else {
+          opened.push(win);
+          try { win.blur(); window.focus(); } catch (e) {}
         }
-      });
-      // Se almeno una scheda è stata bloccata, mostra il riquadro di fallback
+      }
+
       if (blocked) {
+        // Tutto o niente: chiudi le schede aperte e resta sulle istruzioni,
+        // senza portare la vista su nessuna scheda.
+        opened.forEach(win => { try { win.close(); } catch (e) {} });
+        window.focus();
         fallback.classList.add("show");
+      } else {
+        // Tutte e 4 aperte: porta la vista solo sull'ultima (la 4ª).
+        fallback.classList.remove("show");
+        const ultima = opened[opened.length - 1];
+        try { ultima.focus(); } catch (e) {}
       }
     });
   </script>
