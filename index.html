@@ -103,16 +103,35 @@
 
     .fallback {
       display: none;
-      margin-top: 2.2rem;
-      padding: 1.4rem 1.5rem;
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      width: 320px;
+      max-width: calc(100vw - 2rem);
+      padding: 1.2rem 1.3rem;
       background: #fbf9f4;
       border: 1px solid var(--rule);
       border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+      z-index: 1000;
     }
     .fallback.show { display: block; }
+    .fallback::before {
+      content: "";
+      position: absolute;
+      top: -9px;
+      right: 22px;
+      width: 16px;
+      height: 16px;
+      background: #fbf9f4;
+      border-top: 1px solid var(--rule);
+      border-left: 1px solid var(--rule);
+      transform: rotate(45deg);
+    }
     .fallback p {
-      margin: 0 0 1rem;
-      line-height: 1.6;
+      margin: 0;
+      line-height: 1.55;
+      font-size: 0.95rem;
       color: var(--ink);
     }
     .fallback p strong { color: var(--primary); }
@@ -135,7 +154,7 @@
     <p class="thanks">🎁 Ti ringraziamo per la tua preziosa collaborazione.</p>
 
     <button class="start" id="apri">
-      INIZIA IL TEST <span class="arrow">→</span>
+      Inizia il test <span class="arrow">→</span>
     </button>
 
     <div class="fallback" id="fallback">
