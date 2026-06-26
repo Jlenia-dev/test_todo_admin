@@ -137,6 +137,28 @@
       color: var(--ink);
     }
     .fallback p strong { color: var(--primary); }
+    .fallback-title {
+      margin: 0 0 0.6rem;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    .fallback-btn {
+      margin-top: 1rem;
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      border: 0;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 0.7rem 1rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .fallback-btn:hover { background: #00404f; }
+    .fallback-btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
   </style>
 </head>
 <body>
@@ -160,7 +182,9 @@
     </button>
 
     <div class="fallback" id="fallback">
-      <p>Il browser ha bloccato l'apertura delle schede. Per consentirle, clicca sull'icona di <strong>popup bloccato</strong> nella barra degli indirizzi e scegli "Consenti sempre", poi premi di nuovo "Inizia il test".</p>
+      <p class="fallback-title">Consenso popup necessario</p>
+      <p>Per consentire al browser di aprire le schede necessarie per l'esecuzione del test, clicca sull'icona di <strong>popup bloccato</strong> nella barra degli indirizzi e scegli "Consenti sempre". Poi premi il pulsante qui sotto.</p>
+      <button class="fallback-btn" id="riprova">Ho consentito — apri le schede</button>
     </div>
   </main>
 
@@ -174,7 +198,7 @@
 
     const fallback = document.getElementById("fallback");
 
-    document.getElementById("apri").addEventListener("click", () => {
+    function apriSchede() {
       const opened = [];
       let blocked = false;
 
@@ -192,17 +216,20 @@
 
       if (blocked) {
         // Tutto o niente: chiudi le schede aperte e resta sulle istruzioni,
-        // senza portare la vista su nessuna scheda.
+        // senza portare la vista su nessuna scheda. Mostra il riquadro.
         opened.forEach(win => { try { win.close(); } catch (e) {} });
         window.focus();
         fallback.classList.add("show");
       } else {
-        // Tutte e 4 aperte: porta la vista solo sull'ultima (la 4ª).
+        // Tutte e 4 aperte: chiudi il riquadro e porta la vista sull'ultima (la 4ª).
         fallback.classList.remove("show");
         const ultima = opened[opened.length - 1];
         try { ultima.focus(); } catch (e) {}
       }
-    });
+    }
+
+    document.getElementById("apri").addEventListener("click", apriSchede);
+    document.getElementById("riprova").addEventListener("click", apriSchede);
   </script>
 </body>
 </html>
