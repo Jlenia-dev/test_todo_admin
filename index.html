@@ -100,6 +100,39 @@
     .start:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
     .start .arrow { transition: transform 0.2s ease; }
     .start:hover .arrow { transform: translateX(3px); }
+
+    .fallback {
+      display: none;
+      margin-top: 2.2rem;
+      padding: 1.4rem 1.5rem;
+      background: #fbf9f4;
+      border: 1px solid var(--rule);
+      border-radius: 14px;
+    }
+    .fallback.show { display: block; }
+    .fallback p {
+      margin: 0 0 1rem;
+      line-height: 1.6;
+      color: var(--ink);
+    }
+    .fallback p strong { color: var(--primary); }
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+    .links a {
+      display: inline-block;
+      text-decoration: none;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 0.6rem 1.1rem;
+      border-radius: 999px;
+    }
+    .links a:hover { background: #00404f; }
+    .links a:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
   </style>
 </head>
 <body>
@@ -121,6 +154,12 @@
     <button class="start" id="apri">
       Inizia il test <span class="arrow">→</span>
     </button>
+
+    <div class="fallback" id="fallback">
+      <p>Il browser ha bloccato l'apertura automatica delle schede. Per consentirle, clicca sull'icona di <strong>popup bloccato</strong> nella barra degli indirizzi e scegli "Consenti sempre", poi premi di nuovo "Inizia il test".</p>
+      <p>In alternativa, apri le 4 schede manualmente:</p>
+      <div class="links" id="links"></div>
+    </div>
   </main>
 
   <script>
@@ -130,8 +169,32 @@
       "https://www.figma.com/proto/ssHZhFwVgIU9mTBDYeR4uS/OURBANK---Intranet--LOTTO-2----Playground-UX-UI?node-id=1975-76359&starting-point-node-id=1658%3A57757",
       "https://www.figma.com/proto/ssHZhFwVgIU9mTBDYeR4uS/OURBANK---Intranet--LOTTO-2----Playground-UX-UI?node-id=1975-76359&starting-point-node-id=1658%3A57757"
     ];
+
+    const fallback = document.getElementById("fallback");
+    const links = document.getElementById("links");
+
+    // Prepara i link manuali (aperti uno per click: sempre consentiti)
+    urls.forEach((url, i) => {
+      const a = document.createElement("a");
+      a.href = url;
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.textContent = "Scheda " + (i + 1);
+      links.appendChild(a);
+    });
+
     document.getElementById("apri").addEventListener("click", () => {
-      urls.forEach(url => window.open(url, "_blank"));
+      let blocked = false;
+      urls.forEach(url => {
+        const win = window.open(url, "_blank");
+        if (!win || win.closed || typeof win.closed === "undefined") {
+          blocked = true;
+        }
+      });
+      // Se almeno una scheda è stata bloccata, mostra il riquadro di fallback
+      if (blocked) {
+        fallback.classList.add("show");
+      }
     });
   </script>
 </body>
